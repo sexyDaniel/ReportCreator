@@ -1,4 +1,5 @@
 ﻿using ReportCreater.Models;
+using ReportCreater.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,15 +21,18 @@ namespace ReportCreater.ViewModels
         private DateTime fromDate;
         private DateTime byDate;
         private bool isFilter;
+        private IDialogService dialogService;
         public bool IsFilter { get { return isFilter; } set { isFilter = value; OnPropertyChanged("IsFilter"); } }
         public ObservableCollection<ClientViewModel> ClientsViewModelsColliction { get; set; }
-        public ApplicationViewModel(EFClientRepository repo)
+        public ApplicationViewModel(IDialogService dialogService,EFClientRepository repo)
         {
             fromDate = DateTime.Now;
             byDate = DateTime.Now;
             clientRepository = repo;
             ClientsViewModelsColliction = new ObservableCollection<ClientViewModel>();
             UploadClients();
+            this.dialogService = dialogService;
+            DocxCreater.Message = dialogService.ShowMessage;
         }
 
         public ClientViewModel SelectedClient
@@ -92,8 +96,8 @@ namespace ReportCreater.ViewModels
                       selectedClientForReport.ClientInfoCollection = selectedClientForReport.ClientInfoCollection
                       .OrderBy(c=>DateTime.Parse(c.Date))
                       .ToList();
-                      if (selectedClientReport!=null)
-                        DocxCreater.CreateClientReportAsync(selectedClientForReport);
+
+                      DocxCreater.CreateClientReportAsync(selectedClientForReport);
                   }, (obj) => selectedClientReport !=null));
             }
         }
@@ -115,7 +119,7 @@ namespace ReportCreater.ViewModels
                           .ToList();
                           c.TotalPrice = c.CalcTotalPrice();
                       }
-                      DocxCreater.CreateGeneralMonthReport(clients, Months[SelectedMonth]);
+                      DocxCreater.CreateGeneralMonthReportAsync(clients, Months[SelectedMonth]);
                   }));
             }
         }
@@ -132,6 +136,7 @@ namespace ReportCreater.ViewModels
                       ClientsViewModelsColliction.Insert(0, client);
                       clientRepository.AddClient(client.Client);
                       SelectedClient = client;
+                      dialogService.ShowMessage("Добавлен новый клиент");
                   }));
             }
         }
@@ -149,6 +154,7 @@ namespace ReportCreater.ViewModels
                       {
                           clientRepository.DeleteClient(clientViewModel.Client.Id);
                           ClientsViewModelsColliction.Remove(clientViewModel);
+                          dialogService.ShowMessage($"Клиент {clientViewModel.Name} удален");
                       }
                   }, (obj) => ClientsViewModelsColliction.Count > 0));
             }
@@ -166,6 +172,7 @@ namespace ReportCreater.ViewModels
                       {
                           clientRepository.UpdateClient(c.Client);
                       }
+                      dialogService.ShowMessage("Данные сохранены");
                   }));
             }
         }

@@ -12,7 +12,14 @@ namespace ReportCreater.Models
 {
     public static class DocxCreater
     {
-        public static void CreateGeneralMonthReport(List<Client> clients,string month)
+        public delegate void ShowMessage(string message);
+        public static ShowMessage Message;
+
+        public static async void CreateGeneralMonthReportAsync(List<Client> clients, string month)
+        {
+            await System.Threading.Tasks.Task.Run(() => CreateGeneralMonthReport(clients,month));
+        }
+        private static void CreateGeneralMonthReport(List<Client> clients,string month)
         {
             DocX document = DocX.Create($"C:\\Users\\Acer\\Desktop\\Отчеты\\{month}.docx");
             document.InsertParagraph("Рабочая таблица").FontSize(12).Bold().Alignment = Alignment.center;
@@ -47,6 +54,7 @@ namespace ReportCreater.Models
             foreach (var client in clients)
                 document.InsertParagraph($"{client.Name} - {client.TotalPrice} р").FontSize(12).Bold().Alignment = Alignment.left;
             document.Save();
+           Message($"Отчет за {month} сформирован");
         }
 
         public static async void CreateClientReportAsync(Client client)
@@ -89,7 +97,7 @@ namespace ReportCreater.Models
             table.SetColumnWidth(1, 250);
             table.SetColumnWidth(2, 85);
             table.SetColumnWidth(3, 81);
-            table.Design = TableDesign.ColorfulGridAccent4;
+            table.Design = TableDesign.MediumList1Accent5;
             table.Rows[0].Cells[0].Paragraphs[0].Append("Дата").FontSize(14).Bold().Alignment = Alignment.left;
             table.Rows[0].Cells[1].Paragraphs[0].Append("Выполненные работы").FontSize(14).Bold().Alignment = Alignment.left;
             table.Rows[0].Cells[2].Paragraphs[0].Append("Часы").FontSize(14).Bold().Alignment = Alignment.left;
@@ -112,6 +120,7 @@ namespace ReportCreater.Models
             document.Save();
             document.Dispose();
             ConvertToPdf(client);
+            Message($"Отчет по клиенту {client.Name} сформирован");
         }
         private static void ConvertToPdf(Client client)
         {

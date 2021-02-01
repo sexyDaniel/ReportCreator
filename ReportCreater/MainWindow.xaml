@@ -46,22 +46,13 @@
             <ColumnDefinition Width="327*"/>
             <ColumnDefinition Width="1186*"/>
         </Grid.ColumnDefinitions>
-        <Menu Height="19" VerticalAlignment="Top" Margin="0,0,12.2,0">
-            <MenuItem Header="Создать">
-                <MenuItem Header="Отчет" Height="21" Margin="0,0,-0.2,0">
-                    <MenuItem Header="Общий за">
-
-                    </MenuItem>
-                    <MenuItem Header="По клиенту"/>
-                </MenuItem>
-            </MenuItem>
-            <MenuItem Command="{Binding SaveClientRepository}" Header="Сохранить"/>
-
+        <Menu Height="24" VerticalAlignment="Top" Margin="0,0,12.2,0">
+            <MenuItem FontSize="16" Command="{Binding SaveClientRepository}" Header="Сохранить"/>
         </Menu>
         <TextBox KeyUp="OneHourePriceTextBox_KeyUp" DataContext="{Binding SelectedClient}" Text="{Binding OneHourePrice}" x:Name="OneHourePriceTextBox"  HorizontalAlignment="Left" Margin="564.8,56,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" Height="17" FontSize="14" Grid.Column="1" FontFamily="Arial"/>
         <Label Content="Руб/час" HorizontalAlignment="Left" Margin="619.8,52,0,0" VerticalAlignment="Top" Grid.Column="1" FontSize="14" FontWeight="Bold" Width="66" Height="27"/>
         <TextBox DataContext="{Binding SelectedClient}" Text="{Binding OneMinutePrice}" x:Name="MinutePriceTextBox" IsEnabled="False" HorizontalAlignment="Left" Margin="564.8,79,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="55" Height="17" FontSize="14" Grid.Column="1" FontFamily="Arial"/>
-        <Label Content="Руб/мин" HorizontalAlignment="Left" Margin="619.8,74,0,0" VerticalAlignment="Top" Grid.Column="1" FontSize="14" FontWeight="Bold" Width="67" Height="29"/>
+        <Label Content="Руб/мин" HorizontalAlignment="Left" Margin="619.8,74,0,0" VerticalAlignment="Top" Grid.Column="1" FontSize="14" FontWeight="Bold" Width="73" Height="29"/>
         <ListBox x:Name="ListClients" Grid.Column="1" Margin="23.8,108,819,137.8" FontSize="20" ItemsSource="{Binding ClientsViewModelsColliction}"
                  SelectedItem="{Binding SelectedClient}">
             <ListBox.ItemTemplate>
@@ -147,12 +138,19 @@
                 <TextBox DataContext="{Binding SelectedClientInfo}" TextWrapping="Wrap" Height="198" FontSize="16" Text="{Binding Question, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Left" Margin="3,0,44.6,0"/>
             </StackPanel>
         </GroupBox>
-        <Button Command="{Binding AddCommand}" Content="Добавить клиента" HorizontalAlignment="Center" Margin="39.8,559,942,0" VerticalAlignment="Top" Background="#CA3424CB" FontSize="14" Foreground="#FFE8C4C4" Width="119" Height="28" Grid.Column="1"/>
-        <Button CommandParameter="{Binding SelectedClient}" Command="{Binding DeleteClientCommand}" Content="Удалить клиента" HorizontalAlignment="Center" Margin="163.8,561,819,0" VerticalAlignment="Top" Background="#C4F11717" Width="118" Height="26" Foreground="#FFF5EEEE" FontSize="14" Grid.Column="1"/>
-        <Button Command="{Binding Add}" DataContext="{Binding SelectedClient}" Content="Добавить вопрос" Grid.Column="1" HorizontalAlignment="Left" Margin="718.8,81,0,0" VerticalAlignment="Top" Width="119" FontSize="14" Background="#CA3424CB" Foreground="White" Height="22"/>
-        <Button Command="{Binding DeleteClientInfoCommand}" DataContext="{Binding SelectedClient}" Content="Удалить вопрос" Grid.Column="1" HorizontalAlignment="Left" Margin="870.8,81,0,0" VerticalAlignment="Top" Width="119" FontSize="14" Foreground="#FFF5EEEE" Background="#C4F11717" Height="22"/>
-        <StackPanel DataContext="{Binding SelectedClient}" Margin="302.8,33,611,558.8" Grid.Column="1">
-            <TextBlock Text="Выбранный клиент" FontSize="20" FontWeight="Bold" Height="26" Foreground="#FF010301" Width="199" HorizontalAlignment="Right" Margin="0,0,-11.2,0"  />
+        <Button Command="{Binding AddCommand}" Content="+клиент" HorizontalAlignment="Center" Margin="23.8,567,951,0" VerticalAlignment="Top" FontSize="20" Width="126" Height="34" Grid.Column="1" FontWeight="Bold">
+            <Button.Foreground>
+                <SolidColorBrush Color="White"/>
+            </Button.Foreground>
+            <Button.Background>
+                <SolidColorBrush Color="#FF140056"/>
+            </Button.Background>
+        </Button>
+        <Button CommandParameter="{Binding SelectedClient}" Command="{Binding DeleteClientCommand}" Content="-клиент" HorizontalAlignment="Center" Margin="154.8,567,819,0" VerticalAlignment="Top" Background="#C4DD0000" Width="127" Height="34" Foreground="White" FontSize="20" Grid.Column="1" FontWeight="Bold"/>
+        <Button Command="{Binding Add}" DataContext="{Binding SelectedClient}" Content="+ вопрос" Grid.Column="1" HorizontalAlignment="Left" Margin="359.8,567,0,0" VerticalAlignment="Top" Width="135" FontSize="20" Background="#FF51CD22" Foreground="White" Height="34" FontWeight="Bold"/>
+        <Button Command="{Binding DeleteClientInfoCommand}" DataContext="{Binding SelectedClient}" Content="- вопрос" Grid.Column="1" HorizontalAlignment="Left" Margin="499.8,567,0,0" VerticalAlignment="Top" Width="135" FontSize="20" Foreground="#FFF5EEEE" Background="#C4F11717" Height="34" FontWeight="Bold"/>
+        <StackPanel DataContext="{Binding SelectedClient}" Margin="302.8,33,586,558.8" Grid.Column="1">
+            <TextBlock Text="Выбранный клиент" FontSize="20" FontWeight="Bold" Height="26" Foreground="#FF010301" Width="207" HorizontalAlignment="Left"  />
             <TextBlock Text="Имя" FontSize="14" HorizontalAlignment="Left"  />
             <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="163" HorizontalAlignment="Left" FontSize="16" />
         </StackPanel>

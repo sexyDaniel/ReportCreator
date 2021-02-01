@@ -72,9 +72,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Services\IDialogService.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
     <Compile Include="Models\EFClientInfoRepository.cs" />
     <Compile Include="Models\EFClientRepository.cs" />
+    <Compile Include="Services\DefaultDialogService.cs" />
     <Compile Include="ViewModels\ApplicationViewModel.cs" />
     <Compile Include="ViewModels\BaseViewModel.cs" />
     <Compile Include="ViewModels\ClientInfoViewModel.cs" />
