@@ -12,11 +12,20 @@ namespace ReportCreater.ViewModels
 {
     class ApplicationViewModel : BaseViewModel
     {
+        public string[] Months { get; set; } = { "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь" };
+        private int selectedMonth;
+        public int SelectedMonth{get { return selectedMonth; } set{selectedMonth = value; OnPropertyChanged("SelectedMonth");}}
         private EFClientRepository clientRepository;
         private ClientViewModel selectedClient;
+        private DateTime fromDate;
+        private DateTime byDate;
+        private bool isFilter;
+        public bool IsFilter { get { return isFilter; } set { isFilter = value; OnPropertyChanged("IsFilter"); } }
         public ObservableCollection<ClientViewModel> ClientsViewModelsColliction { get; set; }
         public ApplicationViewModel(EFClientRepository repo)
         {
+            fromDate = DateTime.Now;
+            byDate = DateTime.Now;
             clientRepository = repo;
             ClientsViewModelsColliction = new ObservableCollection<ClientViewModel>();
             UploadClients();
@@ -31,6 +40,25 @@ namespace ReportCreater.ViewModels
                 if (selectedClient != null)
                     selectedClient.OneMinutePrice = Math.Round(selectedClient.OneHourePrice / 60, 3);
                 OnPropertyChanged("SelectedClient");
+            }
+        }
+
+        public DateTime FromDate
+        {
+            get { return fromDate; }
+            set
+            {
+                fromDate = value;
+                OnPropertyChanged("FromDate");
+            }
+        }
+        public DateTime ByDate
+        {
+            get { return byDate; }
+            set
+            {
+                byDate = value;
+                OnPropertyChanged("ByDate");
             }
         }
 
@@ -53,9 +81,42 @@ namespace ReportCreater.ViewModels
                 return createClientReportCommand ??
                   (createClientReportCommand = new RelayCommand(obj =>
                   {
+                      var selectedClientForReport = clientRepository.GetClient(selectedClientReport.Client.Id); 
+                      if (isFilter) 
+                      {
+                          selectedClientForReport.ClientInfoCollection = selectedClientForReport.ClientInfoCollection
+                          .Where(c =>DateTime.Parse(c.Date).Date>=FromDate.Date&& DateTime.Parse(c.Date).Date <= ByDate.Date)
+                          .ToList();
+                          selectedClientForReport.TotalPrice = selectedClientForReport.CalcTotalPrice();
+                      }
+                      selectedClientForReport.ClientInfoCollection = selectedClientForReport.ClientInfoCollection
+                      .OrderBy(c=>DateTime.Parse(c.Date))
+                      .ToList();
                       if (selectedClientReport!=null)
-                        DocxCreater.CreateClientReportAsync(selectedClientReport.Client);
+                        DocxCreater.CreateClientReportAsync(selectedClientForReport);
                   }, (obj) => selectedClientReport !=null));
+            }
+        }
+
+        private RelayCommand createReport;
+        public RelayCommand CreateMonthReport
+        {
+            get
+            {
+                return createReport ??
+                  (createReport = new RelayCommand(obj =>
+                  {
+                      var clients = clientRepository.GetClientsInView();
+                      foreach (var c in clients) 
+                      {
+                          c.ClientInfoCollection = c.ClientInfoCollection
+                          .Where(cI=>DateTime.Parse(cI.Date).Date.Month==(SelectedMonth+1))
+                          .OrderBy(cI=>DateTime.Parse(cI.Date))
+                          .ToList();
+                          c.TotalPrice = c.CalcTotalPrice();
+                      }
+                      DocxCreater.CreateGeneralMonthReport(clients, Months[SelectedMonth]);
+                  }));
             }
         }
 
@@ -67,7 +128,7 @@ namespace ReportCreater.ViewModels
                 return addCommand ??
                   (addCommand = new RelayCommand(obj =>
                   {
-                      ClientViewModel client = new ClientViewModel(new Client() { Name = "Новый клиент", ClientInfoCollection = new List<ClientInfo>() });
+                      ClientViewModel client = new ClientViewModel(new Client() { Name = "Новый клиент"});
                       ClientsViewModelsColliction.Insert(0, client);
                       clientRepository.AddClient(client.Client);
                       SelectedClient = client;
@@ -93,20 +154,6 @@ namespace ReportCreater.ViewModels
             }
         }
 
-
-        private RelayCommand createReport;
-        public RelayCommand CreateReport
-        {
-            get
-            {
-                return createReport ??
-                  (createReport = new RelayCommand(obj =>
-                  {
-                     // DocxCreater.CreateGeneralMonthReport(ClientsViewModelsColliction[0].Client, "example1.docx");
-                  }));
-            }
-        }
-
         private RelayCommand saveClientRepository;
         public RelayCommand SaveClientRepository
         {
@@ -125,7 +172,7 @@ namespace ReportCreater.ViewModels
 
         private void UploadClients() 
         {
-            var clients = clientRepository.GetClientsInView();
+            var clients = clientRepository.GetClientsInView().ToList();
             foreach (var c in clients) 
             {
                 ClientsViewModelsColliction.Add(new ClientViewModel(c));

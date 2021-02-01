@@ -12,39 +12,39 @@ namespace ReportCreater.Models
 {
     public static class DocxCreater
     {
-        public static void CreateGeneralMonthReport(List<ClientViewModel> clientViewModels, string documentPath)
+        public static void CreateGeneralMonthReport(List<Client> clients,string month)
         {
-            DocX document = DocX.Create(documentPath);
+            DocX document = DocX.Create($"C:\\Users\\Acer\\Desktop\\Отчеты\\{month}.docx");
             document.InsertParagraph("Рабочая таблица").FontSize(12).Bold().Alignment = Alignment.center;
-            document.InsertParagraph("Январь 2020").FontSize(12).Bold().Alignment = Alignment.center;
+            document.InsertParagraph($"{month} {DateTime.Now.Year}").FontSize(12).Bold().Alignment = Alignment.center;
             var table = document.AddTable(1, 7);
             table.Rows[0].Cells[0].Paragraphs[0].Append("Дата").Bold().Alignment = Alignment.center;
             table.Rows[0].Cells[1].Paragraphs[0].Append("Клиент").Bold().Alignment = Alignment.center;
             table.Rows[0].Cells[2].Paragraphs[0].Append("Вопрос").Bold().Alignment = Alignment.center;
-            table.Rows[0].Cells[3].Paragraphs[0].Append("Часы").Bold().Alignment = Alignment.center;
+            table.Rows[0].Cells[3].Paragraphs[0].Append("Время").Bold().Alignment = Alignment.center;
             table.Rows[0].Cells[4].Paragraphs[0].Append("Фикс. р-та").Bold().Alignment = Alignment.center;
             table.Rows[0].Cells[5].Paragraphs[0].Append("Руб/ч").Bold().Alignment = Alignment.center;
             table.Rows[0].Cells[6].Paragraphs[0].Append("Цена").Bold().Alignment = Alignment.center;
             var i = 1;
-            foreach (var client in clientViewModels)
+            foreach (var client in clients)
             {
                 foreach (var clientInfo in client.ClientInfoCollection)
                 {
                     table.InsertRow();
                     table.Rows[i].Cells[1].Paragraphs[0].Append(client.Name).Alignment = Alignment.center;
                     table.Rows[i].Cells[0].Paragraphs[0].Append(clientInfo.Date).Alignment = Alignment.center;
-                    table.Rows[i].Cells[2].Paragraphs[0].Append(clientInfo.Question).Alignment = Alignment.center;
-                    table.Rows[i].Cells[3].Paragraphs[0].Append(clientInfo.HourCount.ToString()).Alignment = Alignment.center;
+                    table.Rows[i].Cells[2].Paragraphs[0].Append(clientInfo.Question).Alignment = Alignment.left;
+                    table.Rows[i].Cells[3].Paragraphs[0].Append($"{clientInfo.HourCount} ч. {clientInfo.MinuteCount} м.").Alignment = Alignment.center;
                     table.Rows[i].Cells[4].Paragraphs[0].Append(clientInfo.StaticWorkPrice.ToString()).Alignment = Alignment.center;
                     table.Rows[i].Cells[5].Paragraphs[0].Append(client.OneHourePrice.ToString()).Alignment = Alignment.center;
-                    table.Rows[i].Cells[6].Paragraphs[0].Append((clientInfo.StaticWorkPrice + clientInfo.HourCount * 60 * client.OneMinutePrice).ToString()).Alignment = Alignment.center;
+                    table.Rows[i].Cells[6].Paragraphs[0].Append(Math.Round(clientInfo.StaticWorkPrice + (clientInfo.HourCount * 60+clientInfo.MinuteCount) *client.OneHourePrice/60,2).ToString()).Alignment = Alignment.center;
                     i++;
                 }
             }
             document.InsertParagraph().InsertTableAfterSelf(table);
             document.InsertParagraph("ИТОГО:").FontSize(14).Alignment = Alignment.left;
             document.InsertParagraph();
-            foreach (var client in clientViewModels)
+            foreach (var client in clients)
                 document.InsertParagraph($"{client.Name} - {client.TotalPrice} р").FontSize(12).Bold().Alignment = Alignment.left;
             document.Save();
         }
@@ -101,7 +101,7 @@ namespace ReportCreater.Models
                 table.Rows[i].Cells[0].Paragraphs[0].Append(clientInfo.Date).FontSize(13).Alignment = Alignment.left;
                 table.Rows[i].Cells[1].Paragraphs[0].Append(clientInfo.Question).FontSize(13).Alignment = Alignment.left;
                 table.Rows[i].Cells[2].Paragraphs[0].Append($"{clientInfo.HourCount} ч. {clientInfo.MinuteCount} мин.").FontSize(13).Alignment = Alignment.left;
-                table.Rows[i].Cells[3].Paragraphs[0].Append((clientInfo.StaticWorkPrice + (clientInfo.HourCount * 60 + clientInfo.MinuteCount) * Math.Round(client.OneHourePrice / 60, 3)).ToString()).FontSize(13).Alignment = Alignment.left;
+                table.Rows[i].Cells[3].Paragraphs[0].Append(Math.Round((clientInfo.StaticWorkPrice + (clientInfo.HourCount * 60 + clientInfo.MinuteCount) * client.OneHourePrice / 60),3).ToString()).FontSize(13).Alignment = Alignment.left;
                 i++;
             }
             document.InsertParagraph().InsertTableAfterSelf(table);
@@ -110,6 +110,7 @@ namespace ReportCreater.Models
             p6.FontSize(16).Bold().Color(Color.Red);
             p6.Alignment = Alignment.left;
             document.Save();
+            document.Dispose();
             ConvertToPdf(client);
         }
         private static void ConvertToPdf(Client client)

@@ -55,8 +55,8 @@ namespace ReportCreater
 
         private void ButtonClick(object sender, RoutedEventArgs e)
         {
-            MinDate.Text = "";
-            MaxDate.Text = "";
+            FromDate.Text = "";
+            ByDate.Text = "";
         }
     }
 }

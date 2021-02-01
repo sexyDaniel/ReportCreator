@@ -22,6 +22,7 @@ namespace ReportCreater.ViewModels
         {
             repository = new EFClientInfoRepository();
             Client = c;
+            //Client.ClientInfoCollection = repository.GetClientInfo(Client.Id);
             UploadClientInfo();
             questionsCount = ClientInfoCollection.Count;
         }
@@ -100,11 +101,11 @@ namespace ReportCreater.ViewModels
                 return add ??
                   (add = new RelayCommand(obj =>
                   {
-                      ClientInfoViewModel clientInfo = new ClientInfoViewModel() { ClientInfo = new ClientInfo() { Question = "Новый вопрос" } };
+                      ClientInfoViewModel clientInfo = new ClientInfoViewModel() { ClientInfo = new ClientInfo() { Question = "Новый вопрос",ClientId = Client.Id,Date=DateTime.Now.ToShortDateString() } };
                       if (ClientInfoCollection == null)
                           ClientInfoCollection = new ObservableCollection<ClientInfoViewModel>();
                       ClientInfoCollection.Insert(0, clientInfo);
-                      repository.AddClientInfo(Client.Id, clientInfo.ClientInfo);
+                      repository.AddClientInfo(clientInfo.ClientInfo);
                       Client.ClientInfoCollection.Add(clientInfo.ClientInfo);
                       QuestionsCount++;
                   }));
@@ -121,21 +122,19 @@ namespace ReportCreater.ViewModels
                   {
                       QuestionsCount--;
                       ClientInfoCollection.Remove(SelectedClientInfo);
-                      Client.ClientInfoCollection.Remove(SelectedClientInfo.ClientInfo);
                       RecalcTotalPrice();
                       repository.DeleteClientInfo(SelectedClientInfo.ClientInfo);
+                      Client.ClientInfoCollection.Remove(SelectedClientInfo.ClientInfo);
                   }, (obj) => ClientInfoCollection.Count > 0));
             }
         }
 
         private void UploadClientInfo() 
         {
-            var clientInfos = repository.GetClientInfo(Client.Id);
             ClientInfoCollection = new ObservableCollection<ClientInfoViewModel>();
-            foreach (var c in clientInfos) 
+            foreach (var c in Client.ClientInfoCollection) 
             {
                 ClientInfoCollection.Add(new ClientInfoViewModel { ClientInfo = c });
-                Client.ClientInfoCollection.Add(c);
             }
         }
         public void RecalcTotalPrice()

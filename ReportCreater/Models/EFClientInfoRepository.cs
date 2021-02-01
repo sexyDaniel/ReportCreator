@@ -8,17 +8,12 @@ namespace ReportCreater.Models
 {
     class EFClientInfoRepository
     {
-        public void AddClientInfo(int clientId, ClientInfo clientInfo)
+        public void AddClientInfo(ClientInfo clientInfo)
         {
             using (ApplicationDbContext context = new ApplicationDbContext())
             {
-                var searchClient = context.Clients.FirstOrDefault(c => c.Id == clientId);
-                if (searchClient != null)
-                {
-                    clientInfo.ClientId = clientId;
                     context.ClientInfos.Add(clientInfo);
-                }
-                context.SaveChanges();
+                    context.SaveChanges();
             }
         }
 
@@ -39,7 +34,7 @@ namespace ReportCreater.Models
         {
             using (ApplicationDbContext context = new ApplicationDbContext()) 
             {
-                return context.ClientInfos.Where(c=>c.ClientId == clientId).ToList(); ;
+                return context.ClientInfos.Where(c=>c.ClientId == clientId).ToList();
             }
         }
     }

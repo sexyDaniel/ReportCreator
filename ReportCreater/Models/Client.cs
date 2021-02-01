@@ -8,15 +8,12 @@ namespace ReportCreater.Models
 {
     public class Client
     {
-        public Client() 
-        {
-            ClientInfoCollection = new List<ClientInfo>();
-        }
         public int Id { get; set; }
         public double OneHourePrice { get; set; }
         public decimal TotalPrice { get; set; }
         public string Name { get; set; }
-        public ICollection<ClientInfo> ClientInfoCollection { get; set; }
+
+        public List<ClientInfo> ClientInfoCollection { get; set; }
 
         public decimal CalcTotalPrice()
         {

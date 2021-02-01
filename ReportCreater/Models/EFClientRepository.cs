@@ -16,12 +16,28 @@ namespace ReportCreater.Models
                 context.SaveChanges();
             }
         }
-     
-        public List<Client> GetClientsInView() 
+
+        public List<Client> GetClientsInView()
         {
             using (ApplicationDbContext context = new ApplicationDbContext())
             {
-                return context.Clients.ToList();
+                var clients = context.Clients.ToList();
+                foreach (var client in clients) 
+                {
+                    client.ClientInfoCollection = context.ClientInfos.Where(ci=>ci.ClientId==client.Id).ToList();
+                }
+                return clients;
+            }
+        }
+
+        public Client GetClient(int clientId) 
+        {
+            using (ApplicationDbContext context = new ApplicationDbContext()) 
+            {
+                var client = context.Clients.FirstOrDefault(c=>c.Id==clientId);
+                if(client!=null)
+                    client.ClientInfoCollection = context.ClientInfos.Where(c => c.ClientId == clientId).ToList();
+                return client;
             }
         }
 

@@ -31,6 +31,14 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <Style x:Key="IsFilterTrigger" TargetType="DatePicker">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding ElementName=Date, Path=IsChecked}"
+                        Value="False">
+                    <Setter Property="IsEnabled" Value="False"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -148,23 +156,28 @@
             <TextBlock Text="Имя" FontSize="14" HorizontalAlignment="Left"  />
             <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Width="163" HorizontalAlignment="Left" FontSize="16" />
         </StackPanel>
-        <TabControl HorizontalAlignment="Left" Height="440" Margin="8,108,0,0" VerticalAlignment="Top" Width="283">
+        <TabControl HorizontalAlignment="Left" Height="382" Margin="8,108,0,0" VerticalAlignment="Top" Width="236">
             <TabItem Header="Общий">
-                <Grid Background="#FFE5E5E5"/>
+                <Grid Background="#FFE5E5E5">
+                    <ComboBox ItemsSource="{Binding Months}" SelectedIndex="{Binding SelectedMonth}" Margin="10,120,0,0" Width="120" VerticalAlignment="Top" HorizontalAlignment="Center"/>
+                    <Label Content="Выберите месяц" HorizontalAlignment="Left" Margin="55,94,0,0" VerticalAlignment="Top" Width="103"/>
+                    <Button Command="{Binding CreateMonthReport}" Content="Сформировать" HorizontalAlignment="Left" Margin="60,168,0,0" VerticalAlignment="Top" Width="120" Height="30"/>
+                </Grid>
             </TabItem>
             <TabItem Header="По клиенту">
                 <Grid Background="#FFE5E5E5">
-                    <DataGrid AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray" ItemsSource="{Binding ClientsViewModelsColliction}" SelectedItem="{Binding SelectedClientReport}" Margin="10,10,10.2,154">
+                    <DataGrid AutoGenerateColumns="False" HorizontalGridLinesBrush="DarkGray" ItemsSource="{Binding ClientsViewModelsColliction}" SelectedItem="{Binding SelectedClientReport}" Margin="10,10,18.4,130.4">
                         <DataGrid.Columns>
-                            <DataGridTextColumn FontSize="14" Header="Имя" Binding="{Binding Name}" Width="120" />
+                            <DataGridTextColumn FontSize="14" Header="Имя" Binding="{Binding Name}" Width="150" />
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Command="{Binding CreateClientReportCommand}" Content="Сформировать" HorizontalAlignment="Left" Margin="10,376,0,0" VerticalAlignment="Top" Width="101" Height="26"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="63,280,0,0" TextWrapping="Wrap" Text="С:" VerticalAlignment="Top"/>
-                    <TextBlock HorizontalAlignment="Left" Margin="55,308,0,0" TextWrapping="Wrap" Text="По:" VerticalAlignment="Top"/>
-                    <DatePicker x:Name="MinDate" HorizontalAlignment="Left" Margin="82,276,0,0" VerticalAlignment="Top"/>
-                    <DatePicker x:Name="MaxDate" HorizontalAlignment="Left" Margin="82,304,0,0" VerticalAlignment="Top"/>
-                    <Button Name="ClearDate" Click="ButtonClick" Content="Сбросить дату" HorizontalAlignment="Left" Margin="185,376,0,0" VerticalAlignment="Top" Width="82" Height="26"/>
+                    <Button Command="{Binding CreateClientReportCommand}" Content="Сформировать" HorizontalAlignment="Left" Margin="10,324,0,0" VerticalAlignment="Top" Width="101" Height="26"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="45,265,0,0" TextWrapping="Wrap" Text="С:" VerticalAlignment="Top"/>
+                    <TextBlock HorizontalAlignment="Left" Margin="37,293,0,0" TextWrapping="Wrap" Text="По:" VerticalAlignment="Top"/>
+                    <DatePicker Style="{StaticResource IsFilterTrigger}" SelectedDate="{Binding Path=FromDate}" x:Name="FromDate" HorizontalAlignment="Left" Margin="66,261,0,0" VerticalAlignment="Top" DisplayDateStart="2021-01-01" DisplayDateEnd="2025-01-01" DisplayDate="2021-01-31"/>
+                    <DatePicker Style="{StaticResource IsFilterTrigger}" SelectedDate="{Binding Path=ByDate}" x:Name="ByDate" HorizontalAlignment="Left" Margin="66,289,0,0" VerticalAlignment="Top" IsTodayHighlighted="True" DisplayDate="2021-01-31"/>
+                    <Button Name="ClearDate" Click="ButtonClick" Content="Сбросить дату" HorizontalAlignment="Left" Margin="130,324,0,0" VerticalAlignment="Top" Width="82" Height="26"/>
+                    <CheckBox x:Name="Date" IsChecked="{Binding IsFilter}" Content="Применить фильтр" HorizontalAlignment="Left" Margin="10,229,0,0" VerticalAlignment="Top"/>
                 </Grid>
             </TabItem>
         </TabControl>

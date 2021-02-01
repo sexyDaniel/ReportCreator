@@ -49,7 +49,10 @@ namespace ReportCreater.ViewModels
         }
         public string Date
         {
-            get { return ClientInfo.Date; }
+            get 
+            {
+                return ClientInfo.Date; 
+            }
             set
             {
                 ClientInfo.Date = value;
